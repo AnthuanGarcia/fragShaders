@@ -8,6 +8,8 @@ uniform float u_time;
 
 out vec4 fragColor;
 
+#define GLOW(r, d, i) pow(r/(d), i)
+
 #define TWO_PI 6.283185
 
 #define PAL1 vec3(0.546,0.542,0.285),\
@@ -28,8 +30,6 @@ out vec4 fragColor;
 #define PAL8 vec3(0.842, 0.420, 0.185), vec3(0.719, 0.625, 0.445), vec3(0.468, 0.132, 1.118), vec3(7.029, 2.147, 5.438)
 #define PAL9 vec3(0.376, 0.777, 0.959), vec3(0.501, 0.477, 0.745), vec3(0.228, 0.161, 0.014), vec3(3.083, 1.247, 0.834)
 #define PAL10 vec3(0.500, 0.830, 0.168), vec3(-0.500, 0.400, 0.968), vec3(-0.500, 0.150, 0.000), vec3(2.000, -1.767, 0.177)
-#define PAL11 vec3(0.910, 0.960, 0.897), vec3(0.814, 0.588, 0.735), vec3(0.888, -0.552, 1.110), vec3(4.227, 3.567, 5.852)
-#define PAL12 vec3(0.300, 0.500, 0.357), vec3(0.698, 0.468, 0.299), vec3(0.768, 1.257, 1.503), vec3(2.824, 3.537, 3.216)
 
 vec3 palette(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
 
@@ -37,32 +37,29 @@ vec3 palette(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
 
 }
 
-float noise(vec2 st) {
-
-    return fract(
-        sin(
-            dot(
-                st.xy,
-                vec2(12.9898,78.233)
-            )
-        ) * 43758.5453123
-    );
-
-}
-
 void main() {
 
-    vec2 uv = gl_FragCoord.xy / u_resolution;
-    //uv.x *= u_resolution.x / u_resolution.y;
+    vec2 uv = gl_FragCoord.xy / u_resolution - 0.5;
+    uv *= 3.0;
+    uv.x *= u_resolution.x / u_resolution.y;
 
-    vec3 col = vec3(1);
+    vec3 col = vec3(0);
+
+    uv.y += sin(u_time) * sin(uv.x + u_time);
+
+    vec3 colWave = palette(uv.x + 0.25*u_time, PAL9);
 
     col = mix(
-        palette(uv.x, PAL12),
-        col,
-        step(0.075, abs(uv.y - 0.5))
+        col, 
+        colWave,
+        GLOW(0.015, abs(uv.y), 0.8)
     );
 
+    col = mix(
+        col,
+        vec3(1),
+        smoothstep(0.0, 0.02, -uv.y)
+    );
 
     fragColor = vec4(col, 1);
 

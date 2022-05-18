@@ -10,7 +10,6 @@ out vec4 fragColor;
 
 #define TWO_PI 6.283185
 #define ZOOM 5.0
-#define SPEED u_time * 1.25
 #define RX 1.0 / min(u_resolution.x, u_resolution.y)
 
 float plot(float p, float t) {
@@ -79,7 +78,7 @@ void main() {
     );
 
     col += palette(
-        fpos.x + id*0.05*u_time*sign(id - 0.5),
+        fpos.x + id*0.05*u_time*sign(id - 0.65),
         a, b, c, d
     );
 
