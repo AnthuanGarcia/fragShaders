@@ -56,8 +56,8 @@ void main() {
     /* -------------- */
 
     /* --- Circle --- */
-    pos = 1.0;
-    vec2 cc = uv + vec2(pos + aspect, 0.0); // circle center
+    float cpos = 1.0;
+    vec2 cc = uv + vec2(cpos + aspect, 0.0); // circle center
 
     vec2 rcc = cc * rot2D(t, 1.0); // rotated Circle Center
     vec2 dr  = rcc + vec2(-R, 0);  // Dot Red
@@ -69,10 +69,10 @@ void main() {
     /* -------------- */
 
     /* --- Line ----- */
-    pos = -1.2;
-    vec2 l = uv + vec2(pos + aspect, 0.0);
+    float lpos = -1.2;
+    vec2 l = uv + vec2(lpos + aspect, 0.0);
 
-    float p = (l.x + 2.2) - cos(t);
+    float p = l.x + (-lpos + cpos) - cos(t);
 
     //float crop = step(-R*R, -dot(cc, cc)) + step(-1.0, -abs(cc.y)) * step(-1.7, -cc.x) * step(0.0, cc.x);
     //float siz = step(-1.0, dr.x);
@@ -150,7 +150,6 @@ void main() {
 #if DRAW_TRI
 
     /* ---- Tri ---- */
-    float cropTri = step(CIRCLE(R, cc), p);
     float cropMidC = step(-sin(t), l.y) * step(0.0, -l.y) + step(sin(t), -l.y) * step(0.0, l.y);
     /* ------------- */
 
@@ -159,7 +158,7 @@ void main() {
         col,
         vec3(1),
         //plot( abs(p), 0.015 ) * cropTri * cropMidC
-        GLOW(0.01, abs(p), 1.4) * cropTri * cropMidC
+        GLOW(0.01, abs(p), 1.4) * cropMidC
     );
 
     // Dot in the Diameter
@@ -167,6 +166,14 @@ void main() {
         col,
         vec3(1),
         plot( CIRCLE(0.04, cc - vec2(cos(t), 0)), 0.01 )
+    );
+
+    // Dots
+    col = mix(
+        col,
+        vec3(1),
+        plot( CIRCLE(0.04, cc + vec2(R, 0)), 0.01 ) +
+        plot( CIRCLE(0.04, cc - vec2(R, 0)), 0.01 )
     );
 
 #endif

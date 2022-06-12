@@ -38,7 +38,7 @@ void main() {
     uv.y -= 0.5*cos(uv.x + u_time) + 10.0*sin(0.1*u_time);
 
     uv *= rot2D( length(uv) * 0.1, 1.0);
-    uv *= rot2D(0.35*u_time, -1.0);
+    uv *= rot2D(0.15*u_time, 0.0);
 
     vec2 fpos = fract(uv);
 

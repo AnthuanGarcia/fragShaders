@@ -82,9 +82,9 @@ void main() {
 
         on = -2.0*on + 1.0;
 
-        col += plot( param[0], 0.03 ) * on;
-        col += plot( param[1], 0.03 ) * on;
-        col += plot( param[2], 0.03 ) * on;
+        col += (plot( param[0], 0.03 ) +
+                plot( param[1], 0.03 ) +
+                plot( param[2], 0.03 )) * on;
 
     }
 
