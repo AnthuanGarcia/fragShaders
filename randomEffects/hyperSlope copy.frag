@@ -20,6 +20,8 @@ float plot(float p, float t) {
 
 }
 
+/* Fabrice12 */
+
 float aafract(float x) {    // --- antialiased fract
     float v = fract(x),
           w = fwidth(x);    // NB: x must not be discontinuous or factor discont out
@@ -30,6 +32,7 @@ float aastep(float x) {     // --- antialiased step(.5)
     float w = fwidth(x);    // pixel width. NB: x must not be discontinuous or factor discont out
     return smoothstep(.7,-.7,(abs(fract(x-.25)-.5)-.25)/w); // just use (offseted) smooth squares
 }
+/* ----- */
 
 void main() {
 

@@ -24,15 +24,15 @@ void main() {
 
     vec4 col = vec4(0, 0, 0, 1);
 
-    mat2 shear = mat2(
-        1, 1,
-        0.5, 1
+    mat2x3 shear = mat2x3(
+        1, 0, sin(u_time),
+        0, 1, cos(u_time)
     );
 
     uv.x += u_time;
 
     vec2 fpos = fract(uv);
-    vec2 fposdis = fract(uv * shear);
+    vec2 fposdis = fract(vec3(uv, 1) * shear);
 
     float normalGrid = plot(fpos.x, 0.05) + plot(fpos.y, 0.05);
     float distordedGrid = plot(fposdis.x, 0.05) + plot(fposdis.y, 0.05);

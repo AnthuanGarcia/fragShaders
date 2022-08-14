@@ -31,12 +31,12 @@ void main() {
     */
     vec2 st = vec2(
         length(uv),
-        atan(uv.x, uv.y)
+        atan(uv.y, uv.x)
     );
 
     float t = u_time*0.05 + st.x * (0.1*sin(u_time));
     st.y /= PI_2;
-    st.y += t + 0.5;
+    st.y -= t + 0.5;
 
     float y = st.y*PETALS;
     float m = min(fract(y), fract(1.0 - y));

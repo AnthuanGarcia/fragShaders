@@ -1,6 +1,6 @@
 #version 300 es
 
-precision mediump float;
+precision highp float;
 
 uniform vec2 u_resolution;
 uniform vec2 u_mouse;
@@ -66,7 +66,6 @@ void main() {
     vec2 rpos = fract(rotuv * 3.0);
 
     float c = step(-R*R, -dot(circle, circle));
-    float ac = step(-R*R, -dot(otherCircle, otherCircle));
 
     col = mix(
         col,
@@ -81,7 +80,7 @@ void main() {
         sin(warp.x) * cos(warp.y) + 0.6
     );
 
-    col = mix(col, col2, ac);
+    col = mix(col, col2, plot(CIRCLE(R, otherCircle), 0.0));
 
     col = mix(
         col,

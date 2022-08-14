@@ -32,6 +32,7 @@ void main() {
 
 /* ---- Constants ------ */
 
+#define PI     3.14159265
 #define TWO_PI 6.283185
 
 /* ---------------------- */
@@ -42,13 +43,15 @@ void main() {
 // col = 1.0 - exp( -col );
 #define GLOW(r, d, i) pow(r/(d), i)
 #define RX 1.0 / min(u_resolution.x, u_resolution.y)
-#define CIRCLE(r, p) length(p) - abs(r) // Este va con plotting
-#define CIRCLE2(r, p) step(-r*r, -dot(p, p))
+#define CIRCLE(r, p) length(p) - abs(r)
+#define CIRCLE2(r, p) step(dot(p, p), r*r)
 #define SQUARE(l, p) max(p.x, p.y) - l
 #define SDF_SQR(l, p) length( max(abs(p) - l, 0.0) )
 #define ISO_TRI(s, l, p) max( abs(p.y) , abs( s*p.x + p.y*sign(p.x) ) ) - l // chafa
 #define ROMBO(fx, fy, l, p) fx*p.x + fy*p.y - l
-#define ELIPSE(sxy, p, l) dot(p * sxy, p) - l
+#define ELLIPSE(sxy, p, l) dot(p * sxy, p) - l
+
+// abs( fract(U) - .5 ) / fwidth(U) // antialiased lines
 
 float plot(float p, float t) {
 
@@ -64,28 +67,40 @@ float gridp(float x, float t) {
     return smoothstep(k - t, k, f) * (1.0 - smoothstep(k, k + t, f));
 }
 
-mat2 rot2D(float angle, float clock) {
+mat2 rot2D(float angle) {
 
     float c = cos(angle);
     float s = sin(angle);
 
     return mat2(
-        c, clock*s,
-        -clock*s, c
+        c, -s,
+        s, c
     );
 
 }
 
 float noise(vec2 st) {
 
-    return fract(
-        sin(
-            dot(
-                st.xy,
-                vec2(12.9898,78.233)
-            )
-        ) * 43758.5453123
-    );
+    return fract(sin( dot( st.xy, vec2(12.9898,78.233) ) ) * 43758.5453123);
+
+}
+
+float smoothNoise(vec2 st) {
+
+    vec2 ipos = floor(st);
+    vec2 fpos = fract(st);
+
+    fpos = fpos*fpos * (3.0 - 2.0 * fpos);
+
+    float bl = noise(ipos);
+    float br = noise(ipos + vec2(1, 0));
+    float b  = mix(bl, br, fpos.x);
+    
+    float tl = noise(ipos + vec2(0, 1));
+    float tr = noise(ipos + vec2(1));
+    float t  = mix(tl, tr, fpos.x);
+
+    return mix(b, t, fpos.y);
 
 }
 
