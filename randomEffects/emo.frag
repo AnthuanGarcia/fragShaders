@@ -97,8 +97,8 @@ float smoothNoise(vec2 st) {
 
 		vec2 uvGrid = fract(uv * num) - 0.5;
 
-		//vec3 col = (st + 0.05) * 6.0 * SDF_SQR(uvGrid, 0.05, 0.0);
-		vec3 col = st;
+		vec3 col = (st + 0.05) * 6.0 * SDF_SQR(uvGrid, 0.05, 0.0);
+		//vec3 col = st;
 		//vec3 col = texture(u_buffer0, uv).rgb;
 
 		fragColor = vec4(col, 1);

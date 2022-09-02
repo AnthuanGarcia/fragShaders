@@ -8,6 +8,7 @@ uniform float u_time;
 
 out vec4 fragColor;
 
+#define AA 1
 #define ASPECT u_resolution.x / u_resolution.y
 
 #define MAX_STEPS 64
@@ -15,15 +16,23 @@ out vec4 fragColor;
 #define MAX_DIST  16.0
 #define LIM_VAL   1E-4
 
-#define EDGE 0.07
+#define EDGE 0.05
 #define SMOOTH 0.025
 
 #define DEG2R 0.01745329
 
-#define ORTOGRAPHIC 0
-#define RECT_SIZE 4.0
+#define ORTOGRAPHIC 01
+#define RECT_SIZE 9.0
 
-#define VT vec2(u_time, 0)
+#define ONLY_UwU 01
+
+float idFace = 0.0;
+
+float noise(vec2 st) {
+
+    return fract(sin( dot( st.xy, vec2(12.9898,78.233) ) ) * 43758.5453123);
+
+}
 
 mat2 rot2D(float angle) {
 
@@ -44,6 +53,12 @@ vec3 rotate(vec3 p, vec3 a) {
 	p.xy *= rot2D(a.z);
 
 	return p;
+
+}
+
+float sdSphere( vec3 p, float r ) {
+
+	return length(p) - r;
 
 }
 
@@ -76,6 +91,12 @@ float opExtrussion( in vec3 p, in float sdf, in float h ) {
 
 	vec2 w = vec2( sdf, abs(p.z) - h );
   	return min(max(w.x,w.y),0.0) + length(max(w,0.0));
+
+}
+
+float opOnion( in float sdf, in float thickness ) {
+
+    return abs(sdf)-thickness;
 
 }
 
@@ -132,6 +153,61 @@ float sdfU(vec3 p, float d) {
 
 }
 
+float sdfD(vec3 p) {
+
+	p -= vec3(2.3, 0, 0);
+	vec3 sp = p - vec3(1.8, 0, 3);
+	vec3 cp = p - vec3(-0.50, 0, 3);
+
+	cp.zy *= rot2D(90.0 * DEG2R);
+
+	float D = max(
+		sdBox(sp, vec3(2.5, 4.25, 0.25)),
+		opOnion(sdCappedCylinder(cp, 2.5, 1.0), 0.25)
+	);
+
+	vec3 b = p - vec3(-0.45, 0, 3);
+
+	D = min(
+		D,
+		sdBox(b, vec3(0.25, 2.50, 0.25))
+	);
+
+	return D;
+
+}
+
+float colon(in vec3 p) {
+
+	vec3 d = vec3(p.x, abs(p.y), p.z) - vec3(0, 1.8, 3);
+	d.zy *= rot2D(90.0 * DEG2R);
+
+	return sdCappedCylinder(d, 0.35, 0.25);
+
+}
+
+float mouth1(in vec3 p) {
+
+	vec3 q = p - vec3(0, 0, 3);
+	vec3 u = p - vec3(-3, 0, 3);
+	
+	//u.xy *= rot2D(90.0 * DEG2R);
+
+	float m = max(
+		sdBox(q, vec3(6.0, 3.0, 0.25)),
+		-sdSphere(u, 5.0)
+	);
+
+	u.x -= 0.45;
+
+	m = max(
+		m,
+		sdSphere(u, 5.0)
+	);
+
+	return m;
+}
+
 float eyes(in vec3 p) {
 
 	vec3 o = vec3(3, 0, 0);
@@ -160,12 +236,38 @@ float scene(in vec3 p) {
 	);*/
 
 	p -= vec3(0, 0, 3);
-	p = rotate(p, vec3(0, 0.5*u_time, 0));
+	p = rotate(p, vec3(0, 0.7*u_time, 0));
 	p += vec3(0, 0, 3);
 
-	float UwU = min(eyes(p), sdfW(p));
+	p -= vec3(0, 0, 3);
+	p = rotate(p, vec3(0, 45.0*DEG2R*sign(idFace - 0.5), 0));
+	p += vec3(0, 0, 3);
 
-	return UwU;
+#if ONLY_UwU
+
+	return min(eyes(p), sdfW(p));
+
+#else
+
+	float face;
+
+	if (idFace < 0.6) {
+
+		face = min(eyes(p), sdfW(p)); // UwU
+
+	} else if (idFace < 0.7) {
+
+		p += vec3(0.5, 0, 0);
+		face = min(colon(p), mouth1(p)); // :)
+
+	} else {
+		p += vec3(2, -0.5, 0);
+		face = min(colon(p - vec3(0.5, 0, 0)), sdfD(p)); // :D
+	}
+
+	return face;
+
+#endif
 
 }
 
@@ -206,9 +308,9 @@ vec3 march(vec3 ro, vec3 rd) {
 
 }
 
-vec3 getNormal(vec3 p, float d) {
+vec3 getNormal(vec3 p) {
 
-	vec2 h = vec2(LIM_VAL, 0)*d;
+	vec2 h = vec2(LIM_VAL, 0);
 
 	return normalize(
 		vec3(
@@ -222,30 +324,44 @@ vec3 getNormal(vec3 p, float d) {
 
 #define SPECULAR 0.5
 
-vec3 shade(vec3 pos, vec3 ro) {
+vec3 shade(vec3 pos, vec3 ro, int mat) {
 
-	vec3 n = getNormal(pos, distance(pos, ro));
+	vec3 n = getNormal(pos);
 	vec3 viewPos = normalize(ro - pos);
-	vec3 lightDir = normalize(vec3(2, 2,-5) - pos);
+	vec3 lightDir = normalize(vec3(2, 1,-5) - pos);
 	vec3 reflectDir = normalize(reflect(-lightDir, n));
 
 	//vec3 hv = normalize(lightDir + rd);
 	//float spec = dot(n, hv);
 
-	float spec = pow( max( dot(viewPos, reflectDir), 0.0 ), 400.0);
+	float spec = pow( max( dot(viewPos, reflectDir), 0.0 ), 512.0);
 	float diff = dot(n, lightDir);
 
 	//float de = fwidth(diff) * 5.0;
 	//float diffSmooth = smoothstep(0.0, 0.3, diff);
 
-	//float a = sqrt( 1.0 - diff*diff );
-	//vec3 diffuse = a * vec3(0.3804, 0.0, 0.2431);
-	//float de = dot(n, rd);
+	//float dl = dot(n, lightDir);
+	//float de = dot(n, viewPos);
+	//float specA = pow( dl*de + sqrt(1.0 - dl*dl)*sqrt(1.0 - de*de), 4096.0 );
 
 	float kw = (1.0 + dot(n, lightDir)) * 0.5;
 
-	vec3 cw = vec3(0.4, 0.4, 0.7);
-	vec3 cc = vec3(0.8, 0.6, 0.6);
+	vec3 cw, cc;
+
+	switch(mat) {
+		case 0:
+			cw = vec3(0.97, 0.01, 0.78);
+			cc = vec3(0.9333, 1.0, 0.0);
+			break;
+		case 1:
+			cw = vec3(1.0, 0.0, 0.6);
+			cc = vec3(0.9, 0.7, 0.7);
+			break;
+		case 2:
+			cw = vec3(0.2);
+			cc = vec3(0.1);
+			break;
+	}
 
 	//vec3 cw = vec3(0.6431, 0.0078, 0.0078);
 	//vec3 cc = vec3(0.7373, 0.0196, 0.3804);
@@ -255,17 +371,13 @@ vec3 shade(vec3 pos, vec3 ro) {
 	//vec3 specular = vec3(1.0, 1.0, 1.0) * pow(diff * de + a * sqrt( max(1.0 - de*de, 0.0)), 8.0);
 	//float specular = pow(spec, 40.0);
 	float specSmooth = smoothstep(0.0, 0.0025, spec);
+	//float specSmooth = smoothstep(0.0, 0.0025, specA);
 
-	/*if(light < 0.2)
-		toon = 0.2;
-	else if (light < 0.5)
-		toon = 0.5;
-	else
-		toon = 0.9;*/
+	//float toon = smoothstep(0.0, 0.5, diff + spec);
 
-	float toon = smoothstep(0.0, 0.5, diff + spec);
+	//col = floor(0.5 + (1000.0 * col)) / 1000.0;
 
-	return col + specSmooth*vec3(1);
+	return clamp(col + specSmooth*vec3(1), 0.0, 1.0);
 
 	//return col;
 
@@ -273,31 +385,61 @@ vec3 shade(vec3 pos, vec3 ro) {
 
 void main() {
 
+	vec3 col = vec3(0.4902, 0.6824, 0.9294);
+	//vec3 col = vec3(1);
+
+	vec3 tot = vec3(0);
+
+#if AA > 1
+	for( int m=0; m<AA; m++ )
+    for( int n=0; n<AA; n++ )
+    {
+
+    vec2 o = vec2(float(m),float(n)) / float(AA) - 0.5;
+    vec2 uv = (2.0*(gl_FragCoord.xy+o)-u_resolution.xy)/u_resolution.y;
+
+#else
 	vec2 uv = 2.0*(gl_FragCoord.xy / u_resolution) - 1.0;
 	uv.x *= ASPECT;
+#endif
 
-	vec3 col = vec3(0.0471, 0.8118, 0.5294);
+	uv *= 1.5;
+	uv *= rot2D(-45.0 * DEG2R);
 
-	/*uv *= mat2(
-		0.7071, 0.7071,
-		-0.7071, 0.7071
-	);
+	vec2 backf = fract((uv+0.25*u_time)*5.0)-0.5;
+	float thick = 0.01;
 
-	uv.y += 0.5*u_time*sign(uv.x);
+	float sgn = sign(mod(floor(uv.x), 2.0) - 0.5);
+	uv.y += 0.5*u_time*sgn;
 
-	vec2 fpos = fract(uv) - 0.5;*/
+	vec2 fpos = fract(uv) - 0.5;
+	vec2 ipos = floor(uv);
+
+#if ONLY_UwU
+	idFace = mod(ipos.y, 2.0);
+#else
+	idFace = noise(ipos);
+#endif
+
+	int idMat = int(ceil(mod(ipos.y, 3.0)));
 
 #if ORTOGRAPHIC
 
-	vec3 ro = vec3(RECT_SIZE*uv, -1);
+	vec3 ro = vec3(RECT_SIZE*fpos, -6);
 	vec3 rd = vec3(0, 0, 1);
 
 #else
 
 	vec3 ro = vec3(0, 0, -6);
-	vec3 rd = normalize(vec3(uv, 1.0));
+	vec3 rd = normalize(vec3(fpos, 1.0));
 
 #endif
+
+	//ro -= vec3(0, 0, 3);
+	//ro = rotate(ro, vec3(0, 0.5*u_time, 0));
+	//ro += vec3(0, 0, 3);
+
+	//rd = rotate(rd, vec3(0, 0.5*u_time, 0));
 
 	vec3 t = march(ro, rd);
 	float hit = step(t.x, MAX_DIST - LIM_VAL);
@@ -306,12 +448,20 @@ void main() {
 
 	col = mix(
 		col,
-		shade(ro + rd*t.x, ro),
+		shade(ro + rd*t.x, ro, idMat),
 		hit
 	);
 
-	col *= mix(t.z, 1.0, smoothstep(30.,40.,t.y));
+	col *= mix(t.z, 1.0, smoothstep(20.,30.,t.y));
 
-	fragColor = vec4(col, 1);
+	tot += col;
+
+#if AA > 1
+	}
+
+	tot /= float(AA*AA);
+#endif	
+
+	fragColor = vec4(tot, 1);
 
 }

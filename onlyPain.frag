@@ -14,14 +14,17 @@ vec2 brickTile(vec2 _st, float _zoom) {
 
     _st *= _zoom;
 
-    float evenx = mod(_st.y, 2.0);
-    float eveny = mod(_st.x, 2.0);
+    //float evenx = mod(_st.y, 2.0);
+    //float eveny = mod(_st.x, 2.0);
+//
+    //float movex = sign(evenx - 1.0) * SPEED;
+    //float movey = sign(eveny - 1.0) * SPEED;
 
-    float movex = sign(evenx - 1.0) * SPEED;
-    float movey = sign(eveny - 1.0) * SPEED;
+    vec2 even = mod(_st, 2.0);
+    vec2 move = sign(even - 1.0) * SPEED;
 
-    _st.y += movey * step(1.0,   mod(SPEED, 2.0));
-    _st.x += movex * step(-1.0, -mod(SPEED, 2.0));
+    _st.y += move.x * step(1.0,   mod(SPEED, 2.0));
+    _st.x += move.y * step(-1.0, -mod(SPEED, 2.0));
 
     return fract(_st);
 
