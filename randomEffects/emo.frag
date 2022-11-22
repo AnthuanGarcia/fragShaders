@@ -121,10 +121,10 @@ float smoothNoise(vec2 st) {
 
 		col = texture(u_buffer1, uv).rgb;
 
-		/*vec2 v = (uv - 0.5) * 1.5;
+		vec2 v = (uv - 0.5) * 1.5;
 		v *= v;
 
-		col *= pow(1.0 - dot(v, v), 2.5);*/
+		col *= pow(1.0 - dot(v, v), 2.5);
 
 		fragColor = vec4(col, 1.0);
 

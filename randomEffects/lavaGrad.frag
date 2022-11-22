@@ -8,65 +8,18 @@ uniform float u_time;
 
 out vec4 fragColor;
 
-void main() {
-
-    vec2 uv = gl_FragCoord.xy / u_resolution;
-
-    vec3 col;
-
-    fragColor = vec4(col, 1);
-
-}
-
-/*
-    v.rgba colores
-    v.xyzw Posiciones
-    v.stpq Texturas
-    v[0], v[1], v[2], v[3] Lo que sea
-*/
-
-#define MOCO         vec3(0.87, 1, 0)
-#define PINK_NOT_GAY vec3(1, 0, 0.5)
-#define PINK_GAY     vec3(1, 0.75, 1)
-#define ORANGE       vec3(0.9, 0.65, 0)
-
-/* ---- Constants ------ */
-
 #define PI     3.14159265
 #define TWO_PI 6.283185
-#define DEG2R 0.01745329
 
-/* ---------------------- */
+#define PAL12 vec3(0.300, 0.500, 0.357), vec3(0.698, 0.468, 0.299), vec3(0.768, 1.257, 1.503), vec3(2.824, 3.537, 3.216)
+#define PAL2 vec3(0.888,0.218,1.108),\
+        vec3(0.968,-0.472,0.63),\
+        vec3(1.218,0.888,0.00),\
+        vec3(-1.582,1.808,1.478)
 
-/* ----- Utilities ----- */
-
-// Gamma correction
-// col = 1.0 - exp( -col );
-#define GLOW(r, d, i) pow(r/(d), i)
-#define RX 1.0 / min(u_resolution.x, u_resolution.y)
-#define CIRCLE(r, p) length(p) - abs(r)
-#define CIRCLE2(r, p) step(dot(p, p), r*r)
-#define SQUARE(l, p) max(p.x, p.y) - l
-#define SDF_SQR(l, p) length( max(abs(p) - l, 0.0) )
-#define ISO_TRI(s, l, p) max( abs(p.y) , abs( s*p.x + p.y*sign(p.x) ) ) - l // chafa
-#define ROMBO(fx, fy, l, p) fx*p.x + fy*p.y - l
-#define ELLIPSE(sxy, p, l) dot(p * sxy, p) - l
-
-// abs( fract(U) - .5 ) / fwidth(U) // antialiased lines
-
-float plot(float p, float t) {
-
-    return 1.0 - smoothstep(t - RX * 1.5, t + RX * 1.5, p);
-
-}
-
-float gridp(float x, float t) {
-
-    float k = 0.5;
-    float f = fract(x);
-    
-    return smoothstep(k - t, k, f) * (1.0 - smoothstep(k, k + t, f));
-}
+#define PAL5 vec3(0.519, 0.756, 0.712), vec3(0.840, 0.834, 0.469), vec3(0.302, 1.019, 0.804), vec3(3.159, 4.132, 5.220)
+#define PAL6 vec3(0.530, 0.787, 0.485), vec3(0.420, 0.089, 0.758), vec3(0.133, 0.924, 0.008), vec3(4.820, 4.553, 2.869)
+#define PAL11 vec3(0.910, 0.960, 0.897), vec3(0.814, 0.588, 0.735), vec3(0.888, -0.552, 1.110), vec3(4.227, 3.567, 5.852)
 
 mat2 rot2D(float angle) {
 
@@ -105,8 +58,26 @@ float smoothNoise(vec2 st) {
 
 }
 
-float randomRange (in vec2 seed, in float min, in float max) {
-	return min + noise(seed) * (max - min);
+#define OCTAVES 2
+
+float fbm(in vec2 st) {
+
+    float value = 0.0;
+    float amp   = 0.5;
+    vec2 shift  = vec2(10);
+
+    for (int i = 1; i <= OCTAVES; i++) {
+
+        value += amp * smoothNoise(st + 0.5*u_time);
+        st = st * 2.0 + shift;
+
+		st *= rot2D(PI / float(i));
+        amp *= 0.5;
+
+    }
+
+    return value;
+
 }
 
 vec3 palette(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
@@ -178,16 +149,29 @@ float simplex3D(vec3 p)
 
 }
 
-float fbm3D(vec3 p)
-{
-	float f;
-    f  = 0.25*simplex3D( p ); //p = p*2.01;
-    //f += 0.25000*simplex3D( p ); p = p*2.02;
-    //f += 0.12500*simplex3D( p ); p = p*2.03;
-    //f += 0.06250*simplex3D( p ); p = p*2.04;
-    //f += 0.03125*simplex3D( p );
-	return f*0.5+0.5;
+void main() {
+
+	vec2 uv = 2.0*(gl_FragCoord.xy / u_resolution) - 1.0;
+	uv.x *= u_resolution.x / u_resolution.y;
+
+	uv *= 1.5;
+
+	//float h = simplex3D(vec3(uv, u_time));
+	float h = fbm(uv);
+	vec3 col = palette(h + 3.6, PAL11);
+
+	//vec3 col = smoothstep(
+	//	vec3(0.6353, 1.0, 0.0),
+	//	vec3(0.5, 0, 1.0),
+	//	vec3(h)
+	//);
+
+	//vec3 col = mix(
+	//	vec3(1, 0.5, 0),
+	//	vec3(0, 0, 1),
+	//	h
+	//);
+
+	fragColor = vec4(col, 1);
+
 }
-
-
-/* -------------------- */
