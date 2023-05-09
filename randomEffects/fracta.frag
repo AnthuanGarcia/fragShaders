@@ -8,7 +8,7 @@ uniform float u_time;
 
 out vec4 fragColor;
 
-#define PIXELATE 01
+#define PIXELATE 0
 
 #define SIN0_1(x) (0.5 * sin(x) + 0.5)
 

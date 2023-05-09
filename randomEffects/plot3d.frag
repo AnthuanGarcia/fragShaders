@@ -128,11 +128,11 @@ vec3 shade(vec3 ro, vec3 pos, vec3 n) {
 	vec3 reflectDir = normalize(reflect(-lightDir, n));
 
 	float spec = pow( max( dot(viewPos, reflectDir), 0.0 ), 32.0);
-	//float diff = max(dot(n, lightDir), 0.0);
+	float diff = max(dot(n, lightDir), 0.0);
 	float rim  = 1.0 - dot(n, viewPos);
 
 	//spec = smoothstep(0.0, 0.1, spec);
-	rim  = pow(rim, 3.0);
+	//rim  = pow(rim, 3.0);
 
 	float kw = (1.0 + dot(n, lightDir)) * 0.5;
 
@@ -141,13 +141,13 @@ vec3 shade(vec3 ro, vec3 pos, vec3 n) {
 
 	vec3 col = mix(cw, cc, kw);
 
-	//vec3 diffuse = vec3(0.5) * diff;
+	vec3 diffuse = vec3(0.25) * diff;
 	vec3 specular = vec3(1) * spec;
-	vec3 rimLigth = vec3(0.5) * rim;
+	vec3 rimLigth = vec3(0.25) * rim;
 
 	return clamp(
 		col +
-		//diffuse + 
+		diffuse + 
 		specular +
 		rimLigth,
 		0.0, 1.0

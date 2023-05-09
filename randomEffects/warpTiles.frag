@@ -13,7 +13,14 @@ out vec4 fragColor;
 
 float plot(float p, float t) {
 
-    return 1.0 - smoothstep(t - RX * (0.5 + ZOOM), t + RX * (0.5 + ZOOM), p);
+    return 1.0 - smoothstep(t - RX * (1.5 + ZOOM), t + RX * (1.5 + ZOOM), p);
+
+}
+
+float aastep(float threshold, float value) {
+
+    float afwidth = length(vec2(dFdx(value), dFdy(value))) * 0.70710678118654757;
+    return smoothstep(threshold-afwidth, threshold+afwidth, value);
 
 }
 
@@ -44,7 +51,7 @@ void main() {
 
     vec3 col;
 
-    col += plot( fpos.y, 0.5);
+    col += aastep( 0.5, fpos.y);
 
     fragColor = vec4(col, 1);
 

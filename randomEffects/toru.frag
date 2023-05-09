@@ -12,10 +12,10 @@ out vec4 fragColor;
 
 #define D2R 0.0174532925
 
-#define MAX_STEPS 128
+#define MAX_STEPS 64
 #define MIN_DIST  0.0
-#define MAX_DIST  32.0
-#define LIM_VAL   1E-4
+#define MAX_DIST  4.0
+#define LIM_VAL   1E-3
 
 #define ORTOGRAPHIC 0
 #define RECT_SIZE 1.0
@@ -60,10 +60,10 @@ vec3 getNormal(vec3 p) {
 
 	return normalize(
 		vec3(
-			scene(p + h.xyy) - scene(p),
-			scene(p + h.yxy) - scene(p),
-			scene(p + h.yyx) - scene(p)
-		) //* 1E4
+			scene(p + h.xyy),
+			scene(p + h.yxy),
+			scene(p + h.yyx)
+		) - scene(p) //* 1E4
 	);
 
 }

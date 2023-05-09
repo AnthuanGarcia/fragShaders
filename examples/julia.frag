@@ -49,13 +49,13 @@ void main () {
   uv *= 0.9;
 
   vec2 c = uv;
-  int recursionCount = juliaSet (c, constants[3]);
+  int recursionCount = juliaSet (c, constants[4]);
   float f = float(recursionCount) / float(RECURSION_LIMIT);
 
   float offset = 0.5;
   vec3 saturation = vec3 (1.0, 1.0, 1.0);
   float totalSaturation = 1.0;
-  float ff = pow (f, 1.0 - (f * 1.0));
+  float ff = pow (f, 1.0 - (f * 0.50));
   col.r = smoothstep (0.0, 1.0, ff) * (uv2.x * 0.5 + 0.3);
   col.b = smoothstep (0.0, 1.0, ff) * (uv2.y * 0.5 + 0.3);
   col.g = smoothstep (0.0, 1.0, ff) * (-uv2.x * 0.5 + 0.3);

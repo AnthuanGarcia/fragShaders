@@ -66,7 +66,7 @@ void main() {
         
 #else
 
-    col -= DRAW_RECT(width, 0.7, uv);
+    col -= sign(t-0.5)*DRAW_RECT(width, 0.7, uv);
 
 #endif
 
