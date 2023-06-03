@@ -21,23 +21,34 @@ void main() {
 
 	vec3 col;
 
-	for (float i = 1.0; i <= 3.0; i++) {
+	for (float i = 1.0; i <= 4.0; i++) {
 		uv.x += 0.6/i * cos(uv.y * i * 2.0 + u_time);
 		uv.y += 0.2/i * sin(uv.x * i * 3.0 + u_time);
 		uv *= rot2D(u_time*0.1);
 	}
 
+	float t = u_time*0.25;
+
+	vec3 a = 0.5 * vec3(
+		sin(uv.x + cos(uv.y) + t),
+		cos(uv.x + uv.y + t),
+		sin(sin(uv.x) + cos(uv.y) + t)
+	) + 0.5;
+
 	col = mix(
 		mix(
-			vec3(1.0, 1.0, 1.0),
-			vec3(0.0, 0.1961, 0.9882),
-			-uv.x / 2.0 + 0.5
-		),
-		mix(
-			vec3(0.9686, 0.5255, 0.8353),
-			vec3(1.0, 0.0, 0.4353),
+			//vec3(0.9216, 0.1, 0.4745),
+			//vec3(0.0275, 1.0, 0.9529),
+			vec3(0.1176, 0.5294, 0.9961),
+			vec3(0.0, 0.0824, 1.0),
 			uv.y / 2.0 + 0.5
 		),
+		//mix(
+		//	vec3(1.0, 0.5333, 0.0),
+		//	vec3(1, 0.0, 1.0),
+		//	uv.y / 2.0 + 0.5
+		//),
+		vec3(0.0, 0.749, 1.0),
 		uv.x / 2.0 + 0.5
 	);
 
