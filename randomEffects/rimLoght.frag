@@ -5,11 +5,11 @@ precision mediump float;
 uniform float u_time;
 uniform vec2 u_resolution;
 
-#define ORTOGRAPHIC 0
-#define RECT_SIZE   3.0
+#define ORTOGRAPHIC 01
+#define RECT_SIZE   4.0
 
 #define MAX_STEPS 64
-#define MAX_DIST  16.0
+#define MAX_DIST  6.0
 #define MIN_DIST  0.0
 #define LIM_VAL   1E-4
 
@@ -208,6 +208,8 @@ vec3 shade(vec3 ro, vec3 p) {
 
 }
 
+#define FAR 3.0
+
 void main() {
 
     initIcosahedron();
@@ -217,12 +219,12 @@ void main() {
 
 #if ORTOGRAPHIC
 
-    vec3 ro = vec3(uv*RECT_SIZE, -3);
+    vec3 ro = vec3(uv*RECT_SIZE, -FAR);
     vec3 rd = vec3(0, 0, 1);
 
 #else
 
-    vec3 ro = vec3(0, 0, -3);
+    vec3 ro = vec3(0, 0, -FAR);
     vec3 rd = normalize(vec3(uv, 1));
 
 #endif

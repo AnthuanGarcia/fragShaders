@@ -116,8 +116,8 @@ void main() {
 	vec3 ro = vec3(0, 0, -3);
 	vec3 rd = normalize(vec3(uv, 1.0));
 
-	float noi = smoothNoise(uv*7.0 + 0.25*u_time);
-	float r = 0.25 + 2.0*noi;
+	float noi = smoothNoise(uv*6.0 + 0.35*u_time);
+	float r = 0.25 + 1.5*noi;
 
 	vec2 cyl = cylIntersect(ro, rd, vec3(0), vec3(1, 0, 0), r);
 

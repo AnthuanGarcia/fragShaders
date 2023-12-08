@@ -66,7 +66,7 @@ void main() {
 	float o = 1.3;
 
 #if BLACK 
-	vec3 f = vec3(N, 0.6);
+	vec3 f = vec3(N.y*0.1);
 #else
 
 	vec3 f = mix(

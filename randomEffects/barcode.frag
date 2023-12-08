@@ -12,34 +12,24 @@ out vec4 fragColor;
 
 #define DRAW_TWICE 01
 #define DRAW_RECT(w, h, p) step(-w, -abs(p.x)) * step(-h, -abs(p.y))
-#define DRAW_BARS(p) (DRAW_RECT(width, 0.7, p) * step(0.0, p.y) - DRAW_RECT(width2, 0.7, p) * step(0.0, -p.y)) * sign(p.y)
 
-float noise(vec2 st) {
-    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453);
+float noise(vec2 p) {
+    return fract(sin(p.x * 10.0 + p.y * 1234.5) * 5647.0);
+}
+
+float smoothNoise(vec2 n) {
+
+    const vec2 d = vec2(0.0, 1.0);
+    vec2 b = floor(n);
+    vec2 f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
+    return mix(mix(noise(b), noise(b + d.yx), f.x), mix(noise(b + d.xy), noise(b + d.yy), f.x), f.y);
+
 }
 
 float randomRange (in vec2 seed, in float min, in float max) {
 	return min + noise(seed) * (max - min);
 }
 
-float smoothNoise(vec2 st) {
-
-    vec2 ipos = floor(st);
-    vec2 fpos = fract(st);
-
-    fpos = fpos*fpos * (3.0 - 2.0 * fpos);
-
-    float bl = noise(ipos);
-    float br = noise(ipos + vec2(1, 0));
-    float b  = mix(bl, br, fpos.x);
-    
-    float tl = noise(ipos + vec2(0, 1));
-    float tr = noise(ipos + vec2(1));
-    float t  = mix(tl, tr, fpos.x);
-
-    return mix(b, t, fpos.y);
-
-}
 
 void main() {
 
@@ -56,6 +46,8 @@ void main() {
     vec3 col = vec3(t);
 
 #if DRAW_TWICE
+
+#define DRAW_BARS(p) (DRAW_RECT(width, 0.7, p) * step(0.0, p.y) - DRAW_RECT(width2, 0.7, p) * step(0.0, -p.y)) * sign(p.y)
 
     move = ceil(uv.x + 0.25*u_time*sign(uv.y));
 

@@ -62,7 +62,7 @@ void main() {
     vec3 col = vec3(1);
 
     col = mix(
-        palette(uv.x, PAL9),
+        palette(uv.x, PAL10),
         col,
         step(0.075, abs(uv.y - 0.5))
     );

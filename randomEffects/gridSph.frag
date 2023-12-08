@@ -221,7 +221,7 @@ void main() {
 		if (id < 0.5)
 			col = vec3(1) - a(texCoord - 0.3, 0.5);
 		else
-			col = vec3(1) - a(texCoord.xx - 0.3, 0.5);
+			col = vec3(1) - a(texCoord.yx - 0.3, 0.5);
 
 #else
 		col = vec3(0.4275, 0.3176, 0.749) + phong(L, pos, ro);
