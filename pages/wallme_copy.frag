@@ -98,6 +98,7 @@ float roundedboxIntersect( in vec3 ro, in vec3 rd, in vec3 size, in float rad )
     vec3 od = oc*rd;
     float ra2 = rad*rad;
 
+
     t = 1e20;        
 
     // corner
