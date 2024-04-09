@@ -25,6 +25,11 @@ out vec4 fragColor;
 #define RECT_SIZE 9.0
 
 #define ONLY_UwU 01
+#define OTHER_COLS 1
+
+#define PAL25 vec3(1.158, 0.200, 0.758), vec3(0.138, 0.538, 0.233), vec3(1.135, -0.392, 0.898), vec3(2.188, 2.333, 3.195)
+#define PAL22 vec3(0.960, 0.890, -1.102), vec3(0.140, 0.186, 0.150), vec3(0.588, 0.861, 3.138), vec3(5.163, 1.553, 3.277)
+#define PAL9 vec3(0.376, 0.777, 0.959), vec3(0.501, 0.477, 0.745), vec3(0.228, 0.161, 0.014), vec3(3.083, 1.247, 0.834)
 
 float idFace = 0.0;
 
@@ -322,6 +327,10 @@ vec3 getNormal(vec3 p) {
 
 }
 
+vec3 palette(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
+    return a + b*cos( 6.283185*(c*t + d) );
+}
+
 #define SPECULAR 0.5
 
 vec3 shade(vec3 pos, vec3 ro, int mat) {
@@ -343,30 +352,44 @@ vec3 shade(vec3 pos, vec3 ro, int mat) {
 	//float dl = dot(n, lightDir);
 	//float de = dot(n, viewPos);
 	//float specA = pow( dl*de + sqrt(1.0 - dl*dl)*sqrt(1.0 - de*de), 4096.0 );
+	vec3 col;
+
+#if OTHER_COLS
+
+	if (mat == 0) {
+		col = palette(pos.z, PAL25);
+	} else if (mat == 1) {
+		col = vec3(0);
+	} else {
+		col = palette(pos.z, PAL9);
+	}
+
+#else
 
 	float kw = (1.0 + dot(n, lightDir)) * 0.5;
 
 	vec3 cw, cc;
 
-	switch(mat) {
-		case 0:
-			cw = vec3(0.97, 0.01, 0.78);
-			cc = vec3(0.9333, 1.0, 0.0);
-			break;
-		case 1:
-			cw = vec3(1.0, 0.0, 0.6);
-			cc = vec3(0.9, 0.7, 0.7);
-			break;
-		case 2:
-			cw = vec3(0.2);
-			cc = vec3(0.1);
-			break;
+	if (mat == 0) {
+		cw = vec3(0.97, 0.01, 0.78);
+		cc = vec3(0.9333, 1.0, 0.0);
+	} else if (mat == 1){
+		cw = vec3(1.0, 0.0, 0.6);
+		cc = vec3(0.9, 0.7, 0.7);
+	} else {
+		cw = vec3(0.2);
+		cc = vec3(0.1);
 	}
+
+	col = mix(cw, cc, kw);
+
+#endif
+
+
 
 	//vec3 cw = vec3(0.6431, 0.0078, 0.0078);
 	//vec3 cc = vec3(0.7373, 0.0196, 0.3804);
 
-	vec3 col = mix(cw, cc, kw);
 	//vec3 specular = SPECULAR * spec * vec3(1);
 	//vec3 specular = vec3(1.0, 1.0, 1.0) * pow(diff * de + a * sqrt( max(1.0 - de*de, 0.0)), 8.0);
 	//float specular = pow(spec, 40.0);
@@ -385,8 +408,11 @@ vec3 shade(vec3 pos, vec3 ro, int mat) {
 
 void main() {
 
+#if OTHER_COLS
+	vec3 col = vec3(1);
+#else
 	vec3 col = vec3(0.4902, 0.6824, 0.9294);
-	//vec3 col = vec3(1);
+#endif
 
 	vec3 tot = vec3(0);
 
