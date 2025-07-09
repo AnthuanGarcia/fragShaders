@@ -22,6 +22,13 @@ float plot(float p, float t) {
 
 }
 
+float aastep(float threshold, float value) {
+
+    float afwidth = length(vec2(dFdx(value), dFdy(value))) * 0.70710678118654757;
+    return smoothstep(threshold-afwidth, threshold+afwidth, value);
+
+}
+
 mat2 rot2D(float angle) {
 
 	float s = sin(angle), c = cos(angle);
@@ -45,22 +52,23 @@ void main() {
 	uv *= rot2D(length(uv) * 0.05);
 	uv *= rot2D(45.0 * D2R);
 
-	vec3 col = vec3(0);
+	vec3 col = vec3(1.0, 1.0, 1.0);
 	vec3 p = vec3(uv, sin(uv.y + u_time));
 
 	for (float i = 0.01; i <= 0.15; i += 0.01) {
 
-		p.xy *= rot2D(.1);
+		p.xy *= rot2D(.01);
 
 		p.z += sin(2.0*p.y * i);
 
-		p.x += 0.175 * sin(p.y + p.z - u_time);
-		p.y *= 0.175 * cos(p.x + p.z - u_time);
+		p.x += 0.17 * sin(p.y + p.z - u_time);
+		p.y *= 0.17 * cos(p.x + p.z - u_time);
 
 		col = mix(
 			col,
 			palette(xuv.x - 2.9, PAL16) * 1.6,
 			GLOW(0.015, abs(length(p) - 1.5), 1.1)
+			//aastep(abs(length(p) - 1.5), 0.02)
 		);
 
 	}

@@ -37,12 +37,12 @@ void main() {
 	}
 
 	col = mix(
-		palette(-uv.x / 2.0 + 0.5 + u_time*0.3, PAL16),
-		/*mix(
+		//palette(-uv.x / 2.0 + 0.5 + u_time*0.3, PAL16),
+		mix(
 			vec3(0.9686, 0.5255, 0.8353),
 			vec3(1.0, 0.0, 0.4353),
 			uv.y / 2.0 + 0.5
-		),*/
+		),
 		palette(uv.y / 2.0 + 0.5 + u_time*0.2, PAL10),
 		clamp(uv.x * 0.5 + 0.5, 0.0, 1.0)
 	);

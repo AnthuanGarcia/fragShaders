@@ -21,6 +21,10 @@ float plot(float p, float t) {
     //return smoothstep(0.09, 0.0, p);
 }
 
+float getGlow(float dist, float radius, float intensity){
+    return pow(radius/dist, intensity);
+}
+
 void main() {
 
     vec2 uv = gl_FragCoord.xy / u_resolution;
@@ -29,7 +33,7 @@ void main() {
     uv.x *= u_resolution.x / u_resolution.y;
 
     vec3 col = vec3(0);
-    vec3 lineCol = vec3(1, 1, 2);
+    vec3 lineCol = vec3(1, 1, 4);
 
     float t = 2.0*sin(u_time);
 
@@ -42,7 +46,8 @@ void main() {
     }
 
     uv.y += t*WAVE(0.35, uv);
-    col = mix(col, lineCol, GLOW(0.075, abs(uv.y), 0.95));
+    float glow = getGlow( abs(uv.y), 0.075, 0.95) ;
+    col = mix(col, lineCol, glow);
 
     //col = 1.0 - exp( -col );
 

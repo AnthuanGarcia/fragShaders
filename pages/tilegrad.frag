@@ -44,6 +44,10 @@ void main() {
 
     vec3 col;
 
+    uv *= mat2(
+        1, uv.x,
+        -uv.x, 1
+    );
     uv.x += 0.25*u_time;
 
     vec2 ipos = floor(uv);

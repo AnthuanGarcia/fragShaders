@@ -9,7 +9,7 @@ uniform float u_time;
 out vec4 fragColor;
 
 #define ASPECT u_resolution.x / u_resolution.y
-#define AA 1
+#define AA 0
 
 #define GRID 0
 
@@ -42,22 +42,12 @@ float noise(vec2 st) {
 
 }
 
-float smoothNoise(vec2 st) {
+float smoothNoise(vec2 n) {
 
-    vec2 ipos = floor(st);
-    vec2 fpos = fract(st);
-
-    fpos = fpos*fpos * (3.0 - 2.0 * fpos);
-
-    float bl = noise(ipos);
-    float br = noise(ipos + vec2(1, 0));
-    float b  = mix(bl, br, fpos.x);
-    
-    float tl = noise(ipos + vec2(0, 1));
-    float tr = noise(ipos + vec2(1));
-    float t  = mix(tl, tr, fpos.x);
-
-    return mix(b, t, fpos.y);
+    const vec2 d = vec2(0.0, 1.0);
+    vec2 b = floor(n);
+    vec2 f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
+    return mix(mix(noise(b), noise(b + d.yx), f.x), mix(noise(b + d.xy), noise(b + d.yy), f.x), f.y);
 
 }
 

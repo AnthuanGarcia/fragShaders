@@ -1,0 +1,7 @@
+{
+    "editor.fontSize": 14,
+    "glsl-canvas.textures": {
+        "0": "./textures/eva.jpg",
+        "1": "./textures/misato.jpeg"
+    }
+}

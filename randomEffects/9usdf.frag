@@ -25,7 +25,7 @@ out vec4 fragColor;
 #define RECT_SIZE 9.0
 
 #define ONLY_UwU 01
-#define OTHER_COLS 1
+#define OTHER_COLS 0
 
 #define PAL25 vec3(1.158, 0.200, 0.758), vec3(0.138, 0.538, 0.233), vec3(1.135, -0.392, 0.898), vec3(2.188, 2.333, 3.195)
 #define PAL22 vec3(0.960, 0.890, -1.102), vec3(0.140, 0.186, 0.150), vec3(0.588, 0.861, 3.138), vec3(5.163, 1.553, 3.277)

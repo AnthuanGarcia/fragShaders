@@ -225,7 +225,7 @@ vec3 shade(vec3 pos, vec3 ro) {
     float inter = pos.z * 0.3 + u_time * 0.4;
 
     vec3 col = //mix(
-        palette(inter, REFPAL);
+        palette(inter, PAL16);
         //palette(inter, PAL16),
         //sin(u_time * 0.25) * 0.5 + 0.5
     //);

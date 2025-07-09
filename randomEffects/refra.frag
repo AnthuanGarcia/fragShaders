@@ -10,9 +10,9 @@ out vec4 fragColor;
 
 #define ASPECT u_resolution.x / u_resolution.y
 
-#define MAX_STEPS 16
+#define MAX_STEPS 40
 #define MIN_DIST  0.0
-#define MAX_DIST  4.0
+#define MAX_DIST  16.0
 #define LIM_VAL   1E-4
 
 #define ORTOGRAPHIC 01
@@ -55,7 +55,7 @@ vec2 scene(vec3 p) {
 	);
 	
 	float box = sdRoundBox(
-		p + vec3(0, 0.4, 0), vec3(0.2), 0.07
+		p + vec3(0, 0., 0), vec3(0.2), 0.07
 	);
 
 	float id = 1.0;
@@ -184,11 +184,11 @@ void main() {
 
 	vec2 t;
 
-	for(; i < 4.0; i++) {
+	for(; i < 10.0; i++) {
 
 		t = march(ro, rd);
 
-		if (t.x < MAX_DIST - LIM_VAL) {
+		if (t.x < MAX_DIST) {
 
 			//vec3 pos = ro + rd*t.x;
 			//col = shade(pos, ro, t.y);

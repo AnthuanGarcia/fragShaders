@@ -8,7 +8,7 @@ uniform float u_time;
 
 out vec4 fragColor;
 
-#define AA 2
+#define AA 0
 #define ASPECT u_resolution.x / u_resolution.y
 #define RX 1.0 / min(u_resolution.x, u_resolution.y)
 
@@ -218,10 +218,14 @@ void main() {
 
 		texCoord *= 30.0;
 
+		vec2 ddx_uvw = dFdx( texCoord ); 
+        vec2 ddy_uvw = dFdy( texCoord ); 
+
+
 		if (id < 0.5)
 			col = vec3(1) - a(texCoord - 0.3, 0.5);
 		else
-			col = vec3(1) - a(texCoord.yx - 0.3, 0.5);
+			col = vec3(0,1,0) * (1.0 - gridTextureGradBox(texCoord, ddx_uvw, ddy_uvw));
 
 #else
 		col = vec3(0.4275, 0.3176, 0.749) + phong(L, pos, ro);
