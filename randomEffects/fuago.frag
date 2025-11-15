@@ -8,7 +8,7 @@ uniform float u_time;
 
 out vec4 fragColor;
 
-#define BORDER 0
+#define BORDER 1
 #define BLACK 0
 
 #define SIN0(x)((sin(x)+1.)*.5)
